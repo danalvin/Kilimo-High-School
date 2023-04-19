@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ stream.name }}</h1>
+  <p><strong>Start Date:</strong> {{ stream.start_date }}</p>
+  <p><strong>End Date:</strong> {{ stream.end_date }}</p>
+  <h2>Students in {{ stream.name }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Grade Level</th>
+        <th>Date of Birth</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in stream.students.all %}
+        <tr>
+          <td>{{ student.name }}</td>
+          <td>{{ student.grade_level }}</td>
+          <td>{{ student.date_of_birth }}</td>
+          <td>
+            <a href="{% url 'edit_student' student.id %}">Edit</a>
+            <a href="{% url 'delete_student' student.id %}">Delete</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">No students found in {{ stream.name }}.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

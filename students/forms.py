@@ -10,4 +10,5 @@ class StudentRegistrationForm(forms.ModelForm):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ('name', 'date_of_birth', 'grade_level', 'enrollment_date')
+        fields = ('name', 'date_of_birth', 'grade_level')
+        exclude = ('enrollment_date',)
