@@ -1,0 +1,29 @@
+<h1>List of Registered Students</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date of Birth</th>
+            <th>Grade Level</th>
+            <th>Enrollment Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+            <tr>
+                <td>{{ student.name }}</td>
+                <td>{{ student.date_of_birth }}</td>
+                <td>{{ student.grade_level }}</td>
+                <td>{{ student.enrollment_date }}</td>
+                <td><a href="{% url 'student_detail' pk=student.pk %}">View Details</a></td>
+                <td>
+                    <a href="{% url 'update_student' student.pk %}">Edit</a>
+                    <form action="{% url 'delete_student' student.pk %}" method="POST" style="display: inline">
+                        {% csrf_token %}
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
