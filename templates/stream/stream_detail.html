@@ -2,9 +2,19 @@
 
 {% block content %}
   <h1>{{ stream.name }}</h1>
-  <p><strong>Start Date:</strong> {{ stream.start_date }}</p>
-  <p><strong>End Date:</strong> {{ stream.end_date }}</p>
-  <h2>Students in {{ stream.name }}</h2>
+  <h2>Assign a Student to this Stream</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="student">Select a Student:</label>
+    <select name="student" id="student">
+        {% for student in unassigned_students %}
+            <option value="{{ student.pk }}">{{ student.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Assign</button>
+</form>
+<h2>Students in {{ stream.name }}</h2>
   <table>
     <thead>
       <tr>
@@ -20,9 +30,13 @@
           <td>{{ student.name }}</td>
           <td>{{ student.grade_level }}</td>
           <td>{{ student.date_of_birth }}</td>
+          <td><a href="{% url 'student_detail' pk=student.pk %}">View Details</a></td>
           <td>
-            <a href="{% url 'edit_student' student.id %}">Edit</a>
-            <a href="{% url 'delete_student' student.id %}">Delete</a>
+              <a href="{% url 'update_student' student.pk %}">Edit</a>
+              <form action="{% url 'delete_student' student.pk %}" method="POST" style="display: inline">
+                  {% csrf_token %}
+                  <button type="submit">Delete</button>
+              </form>
           </td>
         </tr>
       {% empty %}
@@ -30,6 +44,7 @@
           <td colspan="4">No students found in {{ stream.name }}.</td>
         </tr>
       {% endfor %}
+
     </tbody>
   </table>
 {% endblock %}

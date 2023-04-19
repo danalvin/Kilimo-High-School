@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Add Students to Stream</h1>
+  <form method="POST" class="form">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="stream-select">Select Stream:</label>
+      <select name="stream" id="stream-select">
+        {% for stream in streams %}
+          <option value="{{ stream.id }}">{{ stream.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="student-select">Select Students:</label>
+      <select name="students" id="student-select" multiple>
+        {% for student in students %}
+          <option value="{{ student.id }}">{{ student.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Students</button>
+  </form>
+{% endblock %}

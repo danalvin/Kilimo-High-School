@@ -1,13 +1,16 @@
+from pyexpat.errors import messages
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-
+from django.urls import reverse, reverse_lazy
 from .models import Stream
 from .forms import StreamForm
-
+from django.views import View
 from stream.forms import StreamForm
 from students.models import Student
 from .models import Stream
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
 
 def stream_list(request):
     streams = Stream.objects.all()
@@ -51,6 +54,29 @@ def assign_students(request, pk):
 
 
 
+class AddStudentToStreamView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        stream = get_object_or_404(Stream, pk=pk)
+        students = stream.students.all()
+        available_students = Student.objects.exclude(pk__in=students)
+        context = {
+            'stream': stream,
+            'students': students,
+            'available_students': available_students,
+        }
+        return render(request, 'stream/add_student_to_stream.html', context)
+
+    def post(self, request, pk):
+        stream = get_object_or_404(Stream, pk=pk)
+        student_pk = request.POST.get('student')
+        if student_pk:
+            student = get_object_or_404(Student, pk=student_pk)
+            stream.students.add(student)
+            messages.success(request, f'{student.name} added to {stream.name} stream.')
+        else:
+            messages.warning(request, 'Please select a student to add.')
+        return redirect(reverse('stream:add_student_to_stream', args=[pk]))
+    
 # ========================================================
 
 class StreamListView(ListView):
@@ -62,11 +88,15 @@ class StreamCreateView(CreateView):
     model = Stream
     form_class = StreamForm
     template_name = 'stream/stream_form.html'
+    success_url = reverse_lazy('stream_list')
+
 
 class StreamUpdateView(UpdateView):
     model = Stream
     form_class = StreamForm
     template_name = 'stream/stream_form.html'
+    success_url = reverse_lazy('stream_list')
+
 
 class StreamDeleteView(DeleteView):
     model = Stream
@@ -79,11 +109,17 @@ class StreamDetailView(ListView):
     context_object_name = 'students'
 
     def get_queryset(self):
-        self.stream = get_object_or_404(Stream, id=self.kwargs['pk'])
+        self.stream = get_object_or_404(Stream, slug=self.kwargs['slug'])
         return Student.objects.filter(stream=self.stream)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['stream'] = self.stream
+        context['streams'] = self.stream
         return context
-
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        unassigned_students = queryset.filter(stream=None)
+        for student in unassigned_students:
+            print(student.stream)
+        return unassigned_students

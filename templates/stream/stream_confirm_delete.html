@@ -1,0 +1,10 @@
+
+{% block content %}
+  <h1>Delete Stream</h1>
+  <p>Are you sure you want to delete the {{ stream.name }} stream?</p>
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+    <a href="{% url 'stream_list' %}">Cancel</a>
+  </form>
+{% endblock %}
