@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 class Stream(models.Model):
     name = models.CharField(max_length=255)
-    students = models.ManyToManyField('students.Student', related_name='streams',)
+    students = models.ManyToManyField('students.Student', related_name='stream',)
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
